@@ -18,12 +18,13 @@ public class UnownCipher : MonoBehaviour {
     public TextMesh[] LetterTexts;
     public TextMesh[] StatScreens;
     public TextMesh SubmitText;
-    public Color ShinyColor;
+    public Color[] Colors;
 
     // Logging info
     private static int moduleIdCounter = 1;
     private int moduleId;
     private bool moduleSolved = false;
+    private bool shinyFound = false;
 
     // Solving info
     private Unown[] unown = new Unown[5];
@@ -74,7 +75,13 @@ public class UnownCipher : MonoBehaviour {
         for (int i = 0; i < unown.Length; i++) {
             if (unown[i].getShiny() == true) {
                 Debug.LogFormat("[Unown Cipher #{0}] Unown #{1} is shiny! Lucky you!", moduleId, i + 1);
-                LetterTexts[i].color = ShinyColor;
+                LetterTexts[i].color = Colors[2];
+
+                // Plays only one sound if there are multiple shinies
+                if (shinyFound == false) {
+                    Audio.PlaySoundAtTransform("UnownCipher_Shiny", transform);
+                    shinyFound = true;
+                }
             }
         }
 
@@ -107,8 +114,15 @@ public class UnownCipher : MonoBehaviour {
                 SubmitText.text = "solved";
                 GetComponent<KMBombModule>().HandlePass();
 
-                for (int i = 0; i < LetterScreens.Length; i++)
+                for (int i = 0; i < LetterScreens.Length; i++) {
                     LetterTexts[i].text = "!";
+
+                    if (unown[i].getShiny() == true)
+                        LetterTexts[i].color = Colors[2];
+
+                    else
+                        LetterTexts[i].color = Colors[0];
+                }
 
                 for (int i = 0; i < StatScreens.Length; i++)
                     StatScreens[i].text = "--";
@@ -189,6 +203,22 @@ public class UnownCipher : MonoBehaviour {
         Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, gameObject.transform);
 
         if (moduleSolved == false) {
+            // Changes the colors of the letters to indicate which one is pressed
+            for (int j = 0; j < LetterScreens.Length; j++) {
+                if (unown[j].getShiny() == true)
+                    LetterTexts[j].color = Colors[3];
+
+                else
+                    LetterTexts[j].color = Colors[1];
+            }
+
+            if (unown[i].getShiny() == true)
+                LetterTexts[i].color = Colors[2];
+
+            else
+                LetterTexts[i].color = Colors[0];
+
+            // Displays the stats
             if (unown[i].getStat0() < 10)
                 StatScreens[0].text = "0" + unown[i].getStat0().ToString();
 
@@ -218,7 +248,8 @@ public class UnownCipher : MonoBehaviour {
         }
     }
 
-    //twitch plays
+
+    // Twitch Plays - made by eXish
     private bool inputIsValid(string cmd)
     {
         string[] validstuff = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" };
@@ -312,7 +343,7 @@ public class UnownCipher : MonoBehaviour {
                         while(index != (letterIndexes[i]+1))
                         {
                             Arrows[i].OnInteract();
-                            yield return new WaitForSeconds(0.1f);
+                            yield return new WaitForSeconds(0.025f);
                         }
                     }
                     SubmitButton.OnInteract();
