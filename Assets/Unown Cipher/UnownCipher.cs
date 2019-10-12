@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using KModkit;
 
@@ -176,10 +177,8 @@ public class UnownCipher : MonoBehaviour {
 
             unown[i] = new Unown(stats, letter, letterValue, shiny);
 
-            // Uncomment when manual is released
-
-            //Debug.LogFormat("[Unown Cipher #{0}] Unown #{1} has stats of {2}, {3}, {4}, and {5}. The correct letter is {6}.", moduleId, i + 1,
-            //    stats[0], stats[1], stats[2], stats[3], letter);
+            Debug.LogFormat("[Unown Cipher #{0}] Unown #{1} has stats of {2}, {3}, {4}, and {5}. The correct letter is {6}.", moduleId, i + 1,
+                stats[0], stats[1], stats[2], stats[3], letter);
         }     
     }
 
@@ -216,6 +215,110 @@ public class UnownCipher : MonoBehaviour {
 
             else
                 StatScreens[3].text = unown[i].getStat3().ToString();
+        }
+    }
+
+    //twitch plays
+    private bool inputIsValid(string cmd)
+    {
+        string[] validstuff = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" };
+        for (int i = 0; i < cmd.Length; i++)
+        {
+            string temp = "";
+            temp += cmd.ElementAt(i);
+            temp = temp.ToUpper();
+            if (!validstuff.Contains(temp))
+            {
+                return false;
+            }
+        }
+        if (cmd.Length != 5)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    private bool inputIsValid2(string cmd)
+    {
+        string[] validstuff = { "all", "1", "2", "3", "4", "5" };
+        string temp = cmd.ToLower();
+        if (validstuff.Contains(temp))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    #pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"!{0} submit ABCDE [Submits the 5 specified letters] | !{0} click <#>/all [Clicks the specified Unown (1-5 w/ 1 leftmost and 5 rightmost) or slowly clicks all]";
+    #pragma warning restore 414
+    IEnumerator ProcessTwitchCommand(string command)
+    {
+        string[] parameters = command.Split(' ');
+        if (Regex.IsMatch(parameters[0], @"^\s*click\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            if (parameters.Length == 2)
+            {
+                if (inputIsValid2(parameters[1]))
+                {
+                    yield return null;
+                    if (parameters[1].EqualsIgnoreCase("all"))
+                    {
+                        for(int i = 0; i < 5; i++)
+                        {
+                            LetterScreens[i].OnInteract();
+                            yield return "trycancel Clicking cycle has been cancelled due to a cancel request.";
+                            yield return new WaitForSeconds(2.5f);
+                        }
+                    }
+                    else if (parameters[1].EqualsIgnoreCase("1"))
+                    {
+                        LetterScreens[0].OnInteract();
+                    }
+                    else if (parameters[1].EqualsIgnoreCase("2"))
+                    {
+                        LetterScreens[1].OnInteract();
+                    }
+                    else if (parameters[1].EqualsIgnoreCase("3"))
+                    {
+                        LetterScreens[2].OnInteract();
+                    }
+                    else if (parameters[1].EqualsIgnoreCase("4"))
+                    {
+                        LetterScreens[3].OnInteract();
+                    }
+                    else if (parameters[1].EqualsIgnoreCase("5"))
+                    {
+                        LetterScreens[4].OnInteract();
+                    }
+                }
+            }
+            yield break;
+        }
+        if (Regex.IsMatch(parameters[0], @"^\s*submit\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            if (parameters.Length == 2)
+            {
+                if (inputIsValid(parameters[1]))
+                {
+                    yield return null;
+                    for(int i = 0; i < parameters[1].Length; i++)
+                    {
+                        string ch = "" + parameters[1].ElementAt(i);
+                        ch = ch.ToUpper();
+                        char ch2 = ch.ToCharArray()[0];
+                        int index = char.ToUpper(ch2) - 64;
+                        while(index != (letterIndexes[i]+1))
+                        {
+                            Arrows[i].OnInteract();
+                            yield return new WaitForSeconds(0.1f);
+                        }
+                    }
+                    SubmitButton.OnInteract();
+                }
+            }
+            yield break;
         }
     }
 }
