@@ -14,21 +14,9 @@ MonoBehaviour:
   id: UnownCipher
   title: Unown Cipher
   author: Espik
-  description: 'Unown Cipher v1.1
-
-    "LEAVE NOW"
-
-
-    ModuleID: UnownCipher
-
-
-    Manual: https://ktane.timwi.de/HTML/Unown%20Cipher.html
-
-
-    Source Code: https://github.com/Espik/Unown-Cipher
-
-
-    Author: Espik'
-  version: v1.1
+  description: "Unown Cipher v1.2\n\"LEAVE NOW\"\n\nModuleID: UnownCipher\n\nManual:
+    https://ktane.timwi.de/HTML/Unown%20Cipher.html\n\nSource Code: https://github.com/Espik/Unown-Cipher\n\nAuthor:
+    Espik\n\nSome images are owned by Pok\xE9mon. I do not own them."
+  version: v1.2
   outputFolder: build
   previewImage: {fileID: 2800000, guid: efde24ecb08b33a419d5dc36ade97e1f, type: 3}
