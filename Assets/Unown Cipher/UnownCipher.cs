@@ -343,7 +343,7 @@ public class UnownCipher : MonoBehaviour {
                         while(index != (letterIndexes[i]+1))
                         {
                             Arrows[i].OnInteract();
-                            yield return new WaitForSeconds(0.025f);
+                            yield return new WaitForSeconds(0.05f);
                         }
                     }
                     SubmitButton.OnInteract();
