@@ -340,10 +340,38 @@ public class UnownCipher : MonoBehaviour {
                         ch = ch.ToUpper();
                         char ch2 = ch.ToCharArray()[0];
                         int index = char.ToUpper(ch2) - 64;
-                        while(index != (letterIndexes[i]+1))
+                        int ct1 = 0, ct2 = 0;
+                        int start = letterIndexes[i];
+                        while (start != (index - 1))
                         {
-                            Arrows[i].OnInteract();
-                            yield return new WaitForSeconds(0.05f);
+                            start += 1;
+                            if (start > 26)
+                                start = 0;
+                            ct1++;
+                        }
+                        start = letterIndexes[i];
+                        while (start != (index - 1))
+                        {
+                            start -= 1;
+                            if (start < 0)
+                                start = 26;
+                            ct2++;
+                        }
+                        if (ct1 < ct2)
+                        {
+                            for (int j = 0; j < ct1; j++)
+                            {
+                                Arrows[i].OnInteract();
+                                yield return new WaitForSeconds(0.05f);
+                            }
+                        }
+                        else if (ct1 > ct2)
+                        {
+                            for (int j = 0; j < ct2; j++)
+                            {
+                                Arrows[i + 5].OnInteract();
+                                yield return new WaitForSeconds(0.05f);
+                            }
                         }
                     }
                     SubmitButton.OnInteract();
@@ -351,5 +379,13 @@ public class UnownCipher : MonoBehaviour {
             }
             yield break;
         }
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        string answer = "";
+        for (int i = 0; i < LetterScreens.Length; i++)
+            answer += letters[unown[i].getLetterValue()];
+        yield return ProcessTwitchCommand("submit " + answer);
     }
 }
